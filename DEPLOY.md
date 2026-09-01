@@ -32,14 +32,17 @@ Railway 提供持久化存储卷，数据重启不丢失，部署最简单。
 
 4. **添加持久化存储卷**
    - 在服务设置中点击 "Volumes" → "Add Volume"
-   - 挂载路径填 `/app`（或只挂 `/app/data.json`）
+   - 挂载路径填 `/app/data`
+   - ⚠️ **不要挂载到 `/app`**：Railway/Docker 的卷挂载会用卷内容（初始为空）覆盖镜像里该路径下的所有文件，如果挂载路径是 `/app`，会把 `server.js`、`node_modules` 等应用代码全部覆盖掉，导致启动报错 `Cannot find module '/app/server.js'`。
 
 5. **设置环境变量**
    - 在 "Variables" 中添加：
    ```
    BASE_URL=https://你的应用名.up.railway.app
+   DATA_DIR=/app/data
    ```
    - Railway 会分配一个 `*.up.railway.app` 域名，填入即可
+   - `DATA_DIR` 告诉应用把 `data.json` 存到卷挂载目录下，与代码目录分开
 
 6. **部署完成**
    - 访问 Railway 分配的 URL 即可使用
@@ -111,6 +114,7 @@ Render 免费版无持久化磁盘（重启后文件丢失），需搭配 MongoD
 | 变量名 | 必填 | 说明 |
 |--------|------|------|
 | `BASE_URL` | 云部署必填 | 公网访问地址，如 `https://my-app.onrender.com`。二维码将使用此地址生成 |
+| `DATA_DIR` | Railway 挂载卷时必填 | 持久化数据目录，需与卷挂载路径一致（如 `/app/data`），不填则默认存到应用代码目录下（无持久化） |
 | `MONGODB_DATA_API_URL` | Render 免费版必填 | MongoDB Atlas Data API 端点 URL |
 | `MONGODB_DATA_API_KEY` | Render 免费版必填 | MongoDB Atlas Data API 密钥 |
 | `MONGODB_DATA_SOURCE` | 可选 | MongoDB 集群名称，默认 `Cluster0` |

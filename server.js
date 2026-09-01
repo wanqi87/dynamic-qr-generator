@@ -27,8 +27,9 @@ const MONGO_DATABASE = process.env.MONGODB_DATABASE || 'qr_generator';
 const MONGO_COLLECTION = process.env.MONGODB_COLLECTION || 'qrcodes';
 const USE_MONGO = !!(MONGO_API_URL && MONGO_API_KEY);
 
-// 本地文件存储
-const DATA_FILE = path.join(__dirname, 'data.json');
+// 本地文件存储（DATA_DIR 可选，用于云平台挂载持久化卷时指定独立目录，
+// 避免卷挂载路径与应用代码目录重叠导致代码文件被卷内容覆盖）
+const DATA_FILE = path.join(process.env.DATA_DIR || __dirname, 'data.json');
 
 // ========== 文件存储（本地开发用） ==========
 function loadData() {
