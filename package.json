@@ -1,0 +1,13 @@
+{
+  "name": "dynamic-qr-generator",
+  "version": "1.0.0",
+  "description": "动态二维码生成工具 - 输入YouTube链接生成可动态更新的二维码",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "qrcode": "^1.5.3"
+  }
+}

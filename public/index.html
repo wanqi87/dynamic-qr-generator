@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>动态二维码生成器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <div class="container">
+    <!-- 头部 -->
+    <header class="header">
+      <div class="logo-wrap">
+        <div class="logo-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <path d="M14 14h3v3h-3z M17 17h4 M14 21h3 M21 14v3 M21 21v-0.01"/>
+          </svg>
+        </div>
+        <div>
+          <h1>动态二维码生成器</h1>
+          <p class="subtitle">输入 YouTube 链接，生成可动态更新的二维码</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主卡片 -->
+    <div class="card main-card">
+      <!-- 云部署模式标识 -->
+      <div class="cloud-banner" id="cloud-banner" style="display:none;">
+        <div class="cloud-banner-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          </svg>
+        </div>
+        <div class="cloud-banner-text">
+          <strong>云端部署模式</strong>
+          <span>二维码使用公网地址生成，全球可扫码访问</span>
+        </div>
+        <code id="cloud-url" class="cloud-banner-url"></code>
+      </div>
+
+      <!-- 网络设置（仅本地模式显示） -->
+      <div class="config-section" id="config-section">
+        <div class="config-header">
+          <label class="section-label">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+              <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+              <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+              <line x1="12" y1="20" x2="12.01" y2="20"/>
+            </svg>
+            访问地址设置
+          </label>
+          <span class="config-status" id="config-status">检测中...</span>
+        </div>
+        <div class="config-body">
+          <div class="config-detected">
+            <span class="config-label">检测到的局域网 IP:</span>
+            <code id="detected-ip">--</code>
+          </div>
+          <div class="input-row">
+            <input
+              type="url"
+              id="base-url-input"
+              class="text-input"
+              placeholder="留空则自动使用局域网 IP"
+              autocomplete="off"
+            >
+            <button id="save-config-btn" class="btn btn-outline">
+              保存
+            </button>
+          </div>
+          <div class="config-warning" id="config-warning">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span>手机和电脑需连接同一 WiFi。二维码使用局域网地址生成，扫码即可跳转。如需外网访问，请填入公网域名或 IP。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-divider" id="config-divider"></div>
+
+      <!-- 输入区 -->
+      <div class="section">
+        <label class="section-label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+          YouTube 链接
+        </label>
+        <div class="input-row">
+          <input
+            type="url"
+            id="url-input"
+            class="text-input"
+            placeholder="https://www.youtube.com/watch?v=..."
+            autocomplete="off"
+          >
+          <button id="generate-btn" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/>
+              <path d="M14 14h3v3h-3z M17 17h4 M14 21h3 M21 14v3 M21 21v-0.01"/>
+            </svg>
+            生成二维码
+          </button>
+        </div>
+        <p class="hint" id="generate-hint">支持任意 YouTube 视频链接，生成的二维码可通过扫码直接跳转</p>
+      </div>
+
+      <!-- 二维码展示区 -->
+      <div class="qr-result" id="qr-result" style="display:none;">
+        <div class="qr-display-wrap">
+          <div class="qr-frame">
+            <div class="scan-line"></div>
+            <img id="qr-image" src="" alt="二维码">
+          </div>
+          <div class="qr-id-badge" id="qr-id-badge">ID: --</div>
+        </div>
+
+        <div class="qr-info-panel">
+          <div class="info-item">
+            <span class="info-label">当前链接</span>
+            <span class="info-value" id="current-url">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">跳转地址</span>
+            <span class="info-value mono" id="redirect-url">-</span>
+          </div>
+          <div class="info-item-row">
+            <div class="info-item">
+              <span class="info-label">创建时间</span>
+              <span class="info-value" id="created-at">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">最后更新</span>
+              <span class="info-value" id="updated-at">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="download-btn" class="btn btn-success">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            下载 PNG
+          </button>
+          <button id="copy-btn" class="btn btn-outline">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            复制跳转链接
+          </button>
+        </div>
+      </div>
+
+      <!-- 更新链接区 -->
+      <div class="update-section" id="update-section" style="display:none;">
+        <div class="divider">
+          <span>更换链接（二维码保持不变）</span>
+        </div>
+        <div class="input-row">
+          <input
+            type="url"
+            id="update-url-input"
+            class="text-input"
+            placeholder="输入新的 YouTube 链接"
+            autocomplete="off"
+          >
+          <button id="update-btn" class="btn btn-warning">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            更新链接
+          </button>
+        </div>
+        <p class="hint">更新后扫描同一个二维码将跳转到新的链接，二维码图案不会改变</p>
+      </div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="card history-card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          历史记录
+        </h2>
+        <span class="count-badge" id="history-count">0</span>
+      </div>
+      <div id="history-list" class="history-list">
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <path d="M14 14h3v3h-3z M17 17h4 M14 21h3 M21 14v3 M21 21v-0.01"/>
+          </svg>
+          <p>暂无历史记录</p>
+          <span>生成第一个二维码吧！</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 说明卡片 -->
+    <div class="card info-card">
+      <h3 class="info-card-title">使用说明</h3>
+      <div class="info-grid">
+        <div class="info-step">
+          <div class="step-num">1</div>
+          <div>
+            <strong>输入链接</strong>
+            <p>在输入框中粘贴 YouTube 视频链接，点击「生成二维码」</p>
+          </div>
+        </div>
+        <div class="info-step">
+          <div class="step-num">2</div>
+          <div>
+            <strong>扫码跳转</strong>
+            <p>用手机扫描生成的二维码，会自动跳转到对应的 YouTube 视频</p>
+          </div>
+        </div>
+        <div class="info-step">
+          <div class="step-num">3</div>
+          <div>
+            <strong>动态更换</strong>
+            <p>在「更换链接」区域输入新链接，二维码图案不变，扫码自动跳转到新地址</p>
+          </div>
+        </div>
+        <div class="info-step">
+          <div class="step-num">4</div>
+          <div>
+            <strong>下载保存</strong>
+            <p>点击「下载 PNG」保存高清二维码图片，可用于打印或分享</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

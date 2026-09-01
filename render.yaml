@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: dynamic-qr-generator
+    env: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: BASE_URL
+        value: https://your-app-name.onrender.com
+      # 如需 MongoDB 持久化存储（Render 免费版无持久磁盘，建议配置）
+      # - key: MONGODB_DATA_API_URL
+      #   value: https://data.mongodb-api.com/app/xxxx/endpoint/data/v1
+      # - key: MONGODB_DATA_API_KEY
+      #   sync: false
+      # - key: MONGODB_DATA_SOURCE
+      #   value: Cluster0
